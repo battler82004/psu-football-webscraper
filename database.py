@@ -1,8 +1,10 @@
 # Database Interactions
 # James Taddei
-# 2024-10-01
+# 2024-10-08
 
 import json
+
+DATABASE_FILE = "listings.txt"
 
 def serialized_listing(listing):
     """
@@ -24,7 +26,7 @@ def _read_database():
 
     # Copies all (if any) saved listings to determine which listings are new
     try:
-        with open("listings.txt") as f:
+        with open(DATABASE_FILE) as f:
             for line in f.readlines():
                 lines.append(line.strip())
     except FileNotFoundError: # If there is no "listing.txt", then there just are no saved listings
@@ -64,6 +66,6 @@ def overwrite_saved_listings(listings):
     """
     # Formats listings as JSON formatted strings (lines)
     listings = map(lambda l: f"{serialized_listing(l)}\n", listings)
-    # Writes all of the data from listings into "listings.txt"
-    with open("listings.txt", "w") as f:
+    # Writes all of the data from listings into the database
+    with open(DATABASE_FILE, "w") as f:
         f.writelines(listings)
