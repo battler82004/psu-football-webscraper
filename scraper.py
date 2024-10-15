@@ -1,6 +1,6 @@
 # Scrapes listings from Onward State and stores new ones in "listings.txt"
 # James Taddei
-# 2024-10-01
+# 2024-10-15
 
 import requests
 from bs4 import BeautifulSoup
