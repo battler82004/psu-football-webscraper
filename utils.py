@@ -1,12 +1,12 @@
 # Miscellaneous Utility Functions
 # James Taddei
-# 2024-10-15
+# 2024-10-16
 
 POSSIBLE_KEYS = ["game", "email", "max_price"]
 
 def filter_listings(listings, filter_args):
     """
-    Removes listings that do not meet any inputted arguments.
+    Removes listings that do not meet the inputted arguments.
     """
     for key in filter_args.keys():
         val = filter_args.get(key)

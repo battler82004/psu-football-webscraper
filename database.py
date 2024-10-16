@@ -8,7 +8,7 @@ DATABASE_FILE = "listings.db"
 
 def get_saved_listings():
     """
-    Returns a list of all saved listings in a dictionary format. REWRITE
+    Returns a list of all saved listings in a dictionary format.
     """
     db = sqlite3.connect(DATABASE_FILE)
     cursor = db.cursor()
@@ -20,7 +20,7 @@ def get_saved_listings():
 
 def check_for_unsaved_listings(listings):
     """
-    Returns all unsaved listings in the form of a JSON formatted string (listing). REWRITE
+    Returns a list of all unsaved listings in a dictionary format.
     """
     db = sqlite3.connect(DATABASE_FILE)
     cursor = db.cursor()
@@ -37,7 +37,7 @@ def check_for_unsaved_listings(listings):
 
 def overwrite_saved_listings(listings):
     """
-    Adds all data listings to the database. REWRITE
+    Adds all data listings to the database.
     """
     _reset_db()
     db = sqlite3.connect(DATABASE_FILE)
