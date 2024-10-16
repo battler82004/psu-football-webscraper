@@ -42,7 +42,7 @@ def scrape_listings():
         m = re.search(r"wants \$(.*) for a (.*) \(.*\) ticket.", l)
         assert m is not None # lines with valid emails should include a price and game
 
-        # Stores the price as a float
+        # Sanitizes price and converts it to a float
         price = m.group(1)
         price = price.replace(",", "")  # remove commas in price
         try:

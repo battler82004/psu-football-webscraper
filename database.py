@@ -1,71 +1,77 @@
 # Database Interactions
 # James Taddei
-# 2024-10-08
+# 2024-10-16
 
-import json
+import sqlite3
 
-DATABASE_FILE = "listings.txt"
-
-def serialized_listing(listing):
-    """
-    Serializes the inputted dictionary (listing) into a JSON formatted string.
-    """
-    return json.dumps(listing, sort_keys=True)
-
-def unserialize_line(line):
-    """
-    Unserializes the inputted JSON formatted string (line) into a dictionary (listing).
-    """
-    return json.loads(line)
-
-def _read_database():
-    """
-    Reads and returns all data from the database as a list of JSON formatted strings.
-    """
-    lines = []
-
-    # Copies all (if any) saved listings to determine which listings are new
-    try:
-        with open(DATABASE_FILE) as f:
-            for line in f.readlines():
-                lines.append(line.strip())
-    except FileNotFoundError: # If there is no "listing.txt", then there just are no saved listings
-        pass
-
-    return lines
+DATABASE_FILE = "listings.db"
 
 def get_saved_listings():
     """
-    Returns a list of all saved listings in a dictionary format.
+    Returns a list of all saved listings in a dictionary format. REWRITE
     """
-    saved_lines = _read_database()
-    saved_listings = map(unserialize_line, saved_lines) # JSON formatted string to dictionary
-    return saved_listings
+    db = sqlite3.connect(DATABASE_FILE)
+    cursor = db.cursor()
+
+    query = "SELECT * FROM listings;"
+    res = cursor.execute(query)
+    db.close()
+    return res.fetchall()
 
 def check_for_unsaved_listings(listings):
     """
-    Returns all unsaved listings in the form of a JSON formatted string (listing).
+    Returns all unsaved listings in the form of a JSON formatted string (listing). REWRITE
     """
-    # Get data from database and convert it into a set
-    saved_lines = _read_database()
-    saved_lines = set(saved_lines)
+    db = sqlite3.connect(DATABASE_FILE)
+    cursor = db.cursor()
 
     unsaved_listings = []
+    query = "SELECT * FROM listings WHERE game = ? AND email = ? AND price = ?;"
 
-    # Loops through each listing and adds it to unsaved_listings if it is not already in saved_lines
     for listing in listings:
-        line = serialized_listing(listing)
-        if  (line not in saved_lines):
-            unsaved_listings.append(line)
-
+        res = cursor.execute(query, (listing["game"], listing["email"], listing["price"]))
+        if (res.fetchone() is None):
+            unsaved_listings.append(listing)
+    
     return unsaved_listings
 
 def overwrite_saved_listings(listings):
     """
-    Adds all data listings to the database.
+    Adds all data listings to the database. REWRITE
     """
-    # Formats listings as JSON formatted strings (lines)
-    listings = map(lambda l: f"{serialized_listing(l)}\n", listings)
-    # Writes all of the data from listings into the database
-    with open(DATABASE_FILE, "w") as f:
-        f.writelines(listings)
+    _reset_db()
+    db = sqlite3.connect(DATABASE_FILE)
+    cursor = db.cursor()
+
+    query = "INSERT INTO listings (game, email, price) VALUES (?, ?, ?);"
+
+    for listing in listings:
+        cursor.execute(query, (listing["game"], listing["email"], listing["price"]))
+    
+    db.commit()
+    db.close()
+
+def _reset_db():
+    """
+    Reset (drop and recreate) the database.
+    """
+    db = sqlite3.connect(DATABASE_FILE)
+    cursor = db.cursor()
+
+    query = "DROP TABLE IF EXISTS listings;"
+    cursor.execute(query)
+
+    query = """
+        CREATE TABLE IF NOT EXISTS listings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game TEXT NOT NULL,
+            email TEXT NOT NULL,
+            price REAL NOT NULL
+        )
+    """
+    cursor.execute(query)
+    db.commit()
+    db.close()
+
+if (__name__ == "__main__"):
+    _reset_db()
